@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 import sys
 from time import time
 
@@ -16,8 +17,8 @@ def detect_crop_all_faces(X):
     fail_vec = numpy.zeros(num_frames, dtype=numpy.uint8)
     print all_cropped_faces.shape
 
-    for i in range(num_frames):
-    # for i in range(100):
+    #for i in range(num_frames):
+    for i in range(100):
         img = X[i, :, :, :]
 
         # Detect face / landmarks with dlib
@@ -68,7 +69,6 @@ def detect_face_dlib(frame):
         landmarks = numpy.zeros((2*num_landmarks), dtype='float32')
 
     # print detect_flag, landmarks
-
     return detect_flag, landmarks
 
 
@@ -142,6 +142,11 @@ if __name__ == "__main__":
     output_fail_vec_filename = 'fail_vec_'+subj_id+'.npy'
     save_out_data(save_path, output_X_filename, all_cropped_faces)
     save_out_data(save_path, output_fail_vec_filename, fail_vec)
+
+    # Copy label file
+    y_src_file = os.path.join(npy_file_path, 'y_'+subj_id+'.npy')
+    y_dest_file = os.path.join(save_path, 'y_'+subj_id+'.npy')
+    shutil.copyfile(y_src_file, y_dest_file)
 
     time_elapsed = time() - time_start
     print 'Total Execution Time: %.2f sec.' % time_elapsed
