@@ -1,5 +1,7 @@
+import argparse
 from glob import glob
 import os
+import sys
 import numpy
 import matplotlib.pyplot as plt
 import dlib
@@ -164,10 +166,43 @@ def fill_in_missed_frames(subj_id, orig_face_path, crop_face_path,
     numpy.save(os.path.join(save_path, 'landmarks_'+subj_id+'.npy'), landmarks)
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Script that fixes missed face detections.', 
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--orig_face_path', dest='orig_face_path',
+                        default='/data/Expr_Recog/'
+                                'Chen_Huang_avdata_python_augmented/npy_files/'
+                                'indiv/npy_files_raw/',
+                        help='Path to .npy file containing un-cropped faces.')
+    parser.add_argument('--crop_face_path', dest='crop_face_path',
+                        default='/data/Expr_Recog/'
+                                'Chen_Huang_avdata_python_augmented/npy_files/'
+                                'indiv/npy_files_cropped/',
+                        help='Path to .npy file containing cropped faces.')
+    parser.add_argument('--save_path', dest='save_path',
+                        default='./fixed_faces/',
+                        help='Folder to save output .npy files.')
+
+    # if len(sys.argv) == 1:
+    #     parser.print_help()
+    #     sys.exit(1)
+
+    args = parser.parse_args()
+    return args
+
+
 if __name__ == "__main__":
-    orig_face_path = '/data/Expr_Recog/Chen_Huang_avdata_python_augmented/npy_files/indiv/npy_files_raw/'
-    crop_face_path = '/data/Expr_Recog/Chen_Huang_avdata_python_augmented/npy_files/indiv/npy_files_cropped/'
-    save_path = './fixed_npy_files/'
+    args = parse_args()
+    orig_face_path = args.orig_face_path
+    crop_face_path = args.crop_face_path
+    save_path = args.save_path
+    print args
+
+    #orig_face_path = '/data/Expr_Recog/Chen_Huang_avdata_python_augmented/npy_files/indiv/npy_files_raw/'
+    #crop_face_path = '/data/Expr_Recog/Chen_Huang_avdata_python_augmented/npy_files/indiv/npy_files_cropped/'
+    #save_path = './fixed_npy_files/'
+
+    #copy_file_save_dir(crop_face_path, save_path)
 
     find_subjs_w_misssed_frames(crop_face_path)
 
