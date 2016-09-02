@@ -10,6 +10,7 @@ import skimage.transform
 
 
 def copy_files_to_save_dir(input_path, save_path):
+    print 'Copying files to save_path.'
     print 'Input path: %s' % input_path
     print 'Save_path: %s' % save_path
 
@@ -24,9 +25,9 @@ def copy_files_to_save_dir(input_path, save_path):
             continue
         src_file = os.path.join(input_path, npy_file)
         dst_file = os.path.join(save_path, npy_file)
-        print 'src_file: %s' % src_file
-        print 'dst_file: %s' % dst_file
         shutil.copyfile(src_file, dst_file)
+
+    print 'Done copying files.'
 
 
 def find_subjs_w_misssed_frames(fail_vec_path):
@@ -219,6 +220,7 @@ if __name__ == "__main__":
     save_path = args.save_path
     print args
 
+    # Copy existing .npy files
     copy_files_to_save_dir(crop_face_path, save_path)
 
     find_subjs_w_misssed_frames(crop_face_path)
