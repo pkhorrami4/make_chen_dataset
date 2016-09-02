@@ -14,11 +14,12 @@ from ffvideo import VideoStream
 def detect_crop_all_faces(X):
     num_frames = X.shape[0]
     all_cropped_faces = numpy.zeros((num_frames, 3, 96, 96), dtype=numpy.uint8)
+    all_landmarks = numpy.zeros((num_frames, 2*68), dtype=numpy.float32)
     fail_vec = numpy.zeros(num_frames, dtype=numpy.uint8)
     print all_cropped_faces.shape
 
-    #for i in range(num_frames):
-    for i in range(100):
+    for i in range(num_frames):
+    #for i in range(100):
         img = X[i, :, :, :]
 
         # Detect face / landmarks with dlib
@@ -32,7 +33,13 @@ def detect_crop_all_faces(X):
             crop_frame = skimage.transform.resize(crop_frame, (96, 96))
             crop_frame = numpy.uint8(crop_frame*255.0)
             # skimage.io.imsave('./img_%.4d.jpg' % i, crop_frame)
+
+            # Re-adjust the landmarks
+            landmarks = normalize_landmarks(landmarks, bb, 96)
+
+            # Save cropped image
             all_cropped_faces[i, :, :, :] = crop_frame.transpose(2, 0, 1)
+            all_landmarks[i, :] = landmarks
             fail_vec[i] = 0
             time_elapsed = time() - time_start
             print 'Processing frame (%d/%d) -- %.2f sec.' % (i, num_frames,
@@ -41,7 +48,7 @@ def detect_crop_all_faces(X):
             print 'Face missed in frame (%d/%d)' % (i, num_frames)
             fail_vec[i] = 1
 
-    return all_cropped_faces, fail_vec
+    return all_cropped_faces, all_landmarks, fail_vec
 
 
 def detect_face_dlib(frame):
@@ -70,6 +77,22 @@ def detect_face_dlib(frame):
 
     # print detect_flag, landmarks
     return detect_flag, landmarks
+
+
+def normalize_landmarks(landmarks, face_bb, new_img_size):
+    """ Function to readjust the detected facial landmarks when
+    the face is cropped out of the frame."""
+
+    # Subtract upper left corner of face bounding box
+    rep_face_bb = numpy.tile(face_bb[0:2], len(landmarks)/2)
+    landmarks -= rep_face_bb
+
+    # Scale x,y coordinates from face_w, face_h to be in 96x96 image
+    scale_vec = numpy.tile([new_img_size/face_bb[2], new_img_size/face_bb[3]],
+                           len(landmarks)/2)
+    landmarks *= scale_vec
+
+    return landmarks
 
 
 def crop_frame_using_landmarks(frame, landmarks):
@@ -135,12 +158,14 @@ if __name__ == "__main__":
     X = numpy.load(os.path.join(npy_file_path, input_X_filename))
 
     # Detect and crop faces
-    all_cropped_faces, fail_vec = detect_crop_all_faces(X)
+    all_cropped_faces, all_landmarks, fail_vec = detect_crop_all_faces(X)
 
     # Save data to .npy files
     output_X_filename = 'X_'+subj_id+'.npy'
+    output_landmark_filename = 'landmarks_'+subj_id+'.npy'
     output_fail_vec_filename = 'fail_vec_'+subj_id+'.npy'
     save_out_data(save_path, output_X_filename, all_cropped_faces)
+    save_out_data(save_path, output_landmark_filename, all_landmarks)
     save_out_data(save_path, output_fail_vec_filename, fail_vec)
 
     # Copy label file
