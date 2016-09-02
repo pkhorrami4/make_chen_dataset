@@ -1,11 +1,32 @@
 import argparse
 from glob import glob
 import os
+import shutil
 import sys
 import numpy
 import matplotlib.pyplot as plt
 import dlib
 import skimage.transform
+
+
+def copy_files_to_save_dir(input_path, save_path):
+    print 'Input path: %s' % input_path
+    print 'Save_path: %s' % save_path
+
+    if not os.path.exists(save_path):
+            os.makedirs(save_path)
+
+    npy_file_paths = sorted(glob(os.path.join(input_path, '*.npy')))
+    npy_file_list = [os.path.split(npy_file)[-1] for npy_file in npy_file_paths]
+
+    for npy_file in npy_file_list:
+        if npy_file.startswith('fail_vec'):
+            continue
+        src_file = os.path.join(input_path, npy_file)
+        dst_file = os.path.join(save_path, npy_file)
+        print 'src_file: %s' % src_file
+        print 'dst_file: %s' % dst_file
+        shutil.copyfile(src_file, dst_file)
 
 
 def find_subjs_w_misssed_frames(fail_vec_path):
@@ -198,11 +219,7 @@ if __name__ == "__main__":
     save_path = args.save_path
     print args
 
-    #orig_face_path = '/data/Expr_Recog/Chen_Huang_avdata_python_augmented/npy_files/indiv/npy_files_raw/'
-    #crop_face_path = '/data/Expr_Recog/Chen_Huang_avdata_python_augmented/npy_files/indiv/npy_files_cropped/'
-    #save_path = './fixed_npy_files/'
-
-    #copy_file_save_dir(crop_face_path, save_path)
+    copy_files_to_save_dir(crop_face_path, save_path)
 
     find_subjs_w_misssed_frames(crop_face_path)
 
