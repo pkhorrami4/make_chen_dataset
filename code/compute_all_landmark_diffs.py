@@ -40,7 +40,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Calculate differences between '
         'facial landmark features '
-        'and save a .npy files.',
+        'and save as .npy files.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
         '--dataset_path',
