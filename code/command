@@ -1,0 +1,1 @@
+python -u detect_faces.py --npy_file_path /data/Expr_Recog/Chen_Huang_avdata_python_augmented/npy_files/indiv/npy_files_raw/ --save_path /data/Expr_Recog/Chen_Huang_avdata_python_augmented/npy_files/indiv/npy_files_cropped/ --subj_id 37 &> ./logs_augmented_landmarks/log_37.txt &

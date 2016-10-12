@@ -73,7 +73,7 @@ if __name__ == "__main__":
                                                     data_test.shape)
 
         mean_train, std_train = compute_mean_std(data_train)
-        data_train_norm = (data_train - mean_train) / (std_train + 1e-6)
+        # data_train_norm = (data_train - mean_train) / (std_train + 1e-6)
         # print numpy.mean(landmark_diff_train_norm, axis=0)
         # print numpy.std(landmark_diff_train_norm, axis=0)
         # print landmark_diff_train_norm.shape
